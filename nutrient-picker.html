@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nutrient Picker</title>
+<!-- PWA / ホーム画面アイコン -->
+<link rel="apple-touch-icon" href="nutrient-picker.png">
+<link rel="manifest" href="nutrient-picker.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Nutrient Picker">
+<meta name="theme-color" content="#f26f12">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#fff8f1;--card:#fff;--ink:#4a2c17;--o:#f26f12;--line:#f3d9c4;--sub:#8a6a55;--chip:#fdebdc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e1612;--card:#2a1f19;--ink:#f6e8dc;--line:#4a372b;--sub:#c0a490;--chip:#3b2a20}}
+:root[data-theme="dark"]{--bg:#1e1612;--card:#2a1f19;--ink:#f6e8dc;--line:#4a372b;--sub:#c0a490;--chip:#3b2a20}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif}
+#app{max-width:430px;margin:0 auto;padding:16px 16px 96px}
+h1{font-size:34px;line-height:1.35;margin:24px 0 8px}h2{font-size:17px;margin:4px 0 4px;text-align:center}
+.sub{color:var(--sub);font-size:13px;text-align:center;margin:0 0 14px}.o{color:var(--o)}
+.top{display:flex;align-items:center;gap:8px}.back{border:0;background:none;color:var(--ink);font-size:22px;padding:4px 8px;font-family:inherit}
+.grid{display:grid;gap:10px}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+.tile{position:relative;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 4px;text-align:center;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+.tile .e{display:block;font-size:30px;margin-bottom:4px}.tile.on{border-color:var(--o);background:var(--chip)}
+.tile.on::after{content:"✓";position:absolute;top:-8px;right:-6px;background:var(--o);color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:20px}
+.btn{display:block;width:100%;border:0;border-radius:999px;background:var(--o);color:#fff;font:700 16px inherit;font-family:inherit;padding:14px;margin-top:16px;cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--o);border:2px solid var(--o)}.btn:disabled{opacity:.4}
+.chip{display:inline-block;background:var(--chip);border-radius:8px;padding:3px 9px;margin:2px;font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.chips .tile{padding:10px 12px;flex:1 1 40%}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;text-align:center}
+.big{font-size:84px;margin:6px 0}.meta{display:flex;justify-content:space-around;font-size:13px;color:var(--sub);margin-top:12px}
+.row{display:flex;gap:10px}.row .btn{margin-top:12px}.li{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:14px;cursor:pointer}
+.heart{border:0;background:none;font-size:26px;position:absolute;top:12px;right:12px;cursor:pointer}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav div{display:flex;width:100%;max-width:430px}nav button{flex:1;border:0;background:none;padding:10px 0;font:inherit;font-size:11px;color:var(--sub)}nav button.on{color:var(--o)}nav b{display:block;font-size:20px;font-weight:500}
+#t{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px;opacity:0;transition:.3s;pointer-events:none}
+.edt{border:0;background:none;color:var(--o);font:700 14px inherit;font-family:inherit;padding:4px 8px;width:56px;cursor:pointer}
+.li.on{border-color:var(--o);background:var(--chip)}.ck{color:var(--o);margin-right:8px}
+.bar{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom,0px));padding-top:4px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;text-align:left}
+.box h2{font-size:17px;margin:0 0 6px;text-align:center}
+.srow{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;color:var(--ink);padding:12px 0;border-bottom:1px solid var(--line);text-align:left;cursor:pointer;font:inherit;font-size:15px}
+.srow .g{flex:1}
+.sw{width:46px;height:26px;border-radius:13px;background:var(--line);position:relative;flex:none}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--o)}.sw.on:after{left:23px}
+.lab{font-size:13px;color:var(--sub);margin:16px 0 8px}
+.ti{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
+.step{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;font-size:14px;line-height:1.6}
+.step:last-child{margin-bottom:0}
+.step b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--o);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.mascot{display:block;width:170px;margin:0 auto;filter:drop-shadow(0 6px 10px rgba(120,70,20,.14));animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{50%{translate:0 -6px}}
+@media (prefers-reduced-motion:reduce){.mascot{animation:none}}
+.tip{font-size:12px;color:var(--sub);margin-top:14px;text-align:center}
+</style></head><body><div id="app"></div><div id="t"></div>
+<nav><div id="nav"></div></nav>
+<script>
+const N=[["P","たんぱく質","🥚"],["Fe","鉄","🥩"],["Ca","カルシウム","🥛"],["Fi","食物繊維","🥦"],["C","ビタミンC","🍊"],["B","ビタミンB群","🐟"],["D","ビタミンD","🍄"],["Fo","葉酸","🥬"],["Zn","亜鉛","🦪"],["K","カリウム","🍌"]];
+const NM=Object.fromEntries(N.map(n=>[n[0],n[1]]));
+const SC=[["c","自炊","🍳"],["v","コンビニ","🏪"],["o","外食","🍽️"],["a","どちらでも","✨"]];
+const WI=[["q","手軽に作りたい"],["h","しっかり食べたい"],["v","野菜も摂りたい"],["l","あっさりしたもの"]];
+const EX=[["f","魚"],["m","肉"],["n","納豆"],["e","卵"],["d","乳製品"]];
+// 名前, 絵文字, 栄養素, シーン, 調理分, kcal, 希望タグ, 食材タグ
+const D=[["鮭の塩焼き定食","🍣","P D B","co",20,520,"h l","f"],["納豆とほうれん草の卵丼","🍳","P Fe Fo","c",10,480,"q v","n e"],["サラダチキンとひじきのサラダ","🥗","P Fi Fe","v",5,280,"q l v","m"],["まぐろとアボカドの漬け丼","🍚","P Fe B K","o",0,560,"h","f"],["豚汁定食","🍲","P B Fi","co",25,600,"h v","m"],["あさりとほうれん草の和風パスタ","🍝","Fe B Fo Zn","co",20,560,"h","f"],["牛肉と小松菜の炒め物定食","🥩","Fe B Fo P","co",15,620,"h","m"],["レバニラ炒め","🥬","Fe B Fo Zn","co",15,400,"","m"],["焼き鮭おにぎりと味噌汁","🍙","P D","v",5,400,"q","f"],["豆腐とわかめの味噌汁セット","🥣","Ca Fi","cv",10,300,"q l v",""],["小魚入りチーズトースト","🧀","Ca P","c",8,350,"q","d f"],["ヨーグルトとキウイ","🥝","Ca C","vc",3,200,"q l","d"],["ブロッコリーと卵のサラダ","🥦","C Fo P Fi","cv",10,250,"q l v","e"],["パプリカと鶏肉の炒め","🫑","C B P","co",15,420,"v","m"],["いちごとオレンジ","🍊","C Fo","cv",2,120,"q l",""],["きのことしらすの炊き込みご飯","🍄","D Ca","c",30,480,"","f"],["きのこ鍋","🍲","D Fi B K","co",25,350,"l v",""],["バナナとヨーグルト","🍌","K Ca","vc",2,220,"q l","d"],["アボカドとトマトのサラダ","🥑","K Fi Fo","vc",8,300,"l v",""],["さつまいもと豆の煮物","🍠","K Fi","c",25,340,"l v",""],["牡蠣フライ定食","🦪","Zn Fe","o",0,700,"h","f"],["牛赤身のステーキ","🥩","Zn Fe P B","oc",15,520,"h","m"],["ナッツとチーズ","🥜","Zn Ca","v",0,250,"q","d"],["豆腐ステーキ","🍢","P Ca Fe","c",15,380,"l v",""],["豚しょうが焼き定食","🍖","B P","co",15,650,"h","m"],["納豆巻きとひじき煮","🍙","Fe Fi Fo P","v",3,380,"q","n"],["サバの味噌煮定食","🐟","D P Ca B","oc",25,580,"h","f"],["レンズ豆とほうれん草のカレー","🍛","Fe Fo Fi Zn","co",30,520,"h v",""],["サバ缶と野菜のサラダ","🥗","D P Ca","cv",5,320,"q l v","f"],["ほうれん草と卵のスープ","🥣","Fo Fe","c",10,180,"q l v","e"],["鶏むね肉の蒸し鶏","🍗","P B","cv",15,250,"q l","m"],["鶏レバーの甘辛煮","🍗","Fe B Fo Zn","c",25,280,"","m"],["豚ヒレのソテー","🍖","P B","co",15,420,"h","m"],["親子丼","🍚","P B","co",15,580,"h","m e"],["卵かけご飯と味噌汁","🥚","P","c",5,450,"q","e"],["厚焼き玉子と青菜のお浸し","🍳","P Fo","c",15,300,"l v","e"],["冷奴と薬味","🥢","P Ca","c",3,150,"q l",""],["麻婆豆腐","🌶️","P Ca","co",15,480,"h","m"],["厚揚げと青菜の炒め物","🥬","Ca Fe Fo","c",15,350,"v",""],["豆腐ハンバーグ","🍔","P Ca","c",25,380,"l","m e"],["ひじきの煮物","🌿","Fe Ca Fi","cv",20,120,"l v",""],["切り干し大根の煮物","🥕","Fi Ca K Fe","cv",20,110,"l v",""],["小松菜と油揚げの煮浸し","🥬","Ca Fe Fo","c",10,130,"q l v",""],["ほうれん草のおひたし","🥬","Fo Fe","cv",5,50,"q l v",""],["枝豆","🫛","P Fo Fi","vc",5,130,"q l v",""],["ゆで卵と野菜スティック","🥚","P Fi","v",0,200,"q l v","e"],["ブロッコリーとツナのサラダ","🥗","C P Fo","vc",8,220,"q l v","f"],["いわしの梅煮","🐟","D Ca B P","c",25,320,"","f"],["さんまの塩焼き","🐟","D B P","oc",15,450,"h","f"],["鯖の塩焼き定食","🐟","D B P","oc",20,560,"h","f"],["ぶりの照り焼き","🐟","D B P","co",20,480,"h","f"],["鮭ときのこのホイル焼き","🍄","D B P","c",20,280,"l","f"],["しらす丼","🍚","Ca D P","co",5,420,"q","f"],["海鮮丼","🍣","P D B","ov",0,600,"h","f"],["刺身定食","🍱","P D B","o",0,550,"h l","f"],["あさりの味噌汁","🥣","Fe B Zn","co",10,80,"q l","f"],["しじみの味噌汁","🥣","Fe B","c",10,70,"q l","f"],["ほたてとブロッコリーの炒め","🥦","P Zn C B","c",15,280,"l v","f"],["えびとアスパラの炒め物","🦐","P Zn Fo","c",15,300,"l v","f"],["いかと野菜の炒め","🦑","P Zn B","co",15,320,"","f"],["たこときゅうりの酢の物","🐙","Zn P K","cv",8,100,"q l","f"],["牛丼","🍚","Fe Zn B P","o",5,700,"h","m"],["すき焼き","🥘","Fe Zn P B","oc",25,700,"h","m e"],["ビビンバ丼","🍚","Fe Fo P B","o",10,620,"h v","m e"],["ローストビーフ丼","🥩","Fe Zn B P","o",5,640,"h","m"],["トマトとほうれん草の卵炒め","🍅","Fo Fe C P","c",10,260,"q v","e"],["ピーマンの肉詰め","🫑","C P B","c",30,380,"h v","m"],["パプリカとトマトのマリネ","🫑","C K Fo","vc",10,120,"q l v",""],["ゴーヤチャンプルー","🥒","C P Fe Fo","co",20,380,"v","e m"],["キャベツと鶏のスープ","🥬","C Fo B","c",15,200,"l v","m"],["柿とキウイのフルーツ","🥝","C Fi K Fo","v",2,150,"q l",""],["キウイとオレンジのヨーグルト","🍊","C Ca","vc",3,220,"q l","d"],["グレープフルーツ","🍊","C K","v",2,80,"q l",""],["いちごヨーグルト","🍓","C Ca Fo","vc",3,180,"q l","d"],["チーズオムレツ","🍳","Ca P B","c",10,380,"q","e d"],["グラタン","🧀","Ca P","co",30,520,"h","d"],["ホワイトシチュー","🥘","Ca P","co",30,480,"h v","d m"],["小松菜と豆乳のスムージー","🥤","Ca Fo K","c",5,160,"q l v",""],["豆乳鍋","🍲","Ca P Fe","co",20,420,"l v","m"],["きな粉ヨーグルト","🥛","Ca P Fe","cv",2,200,"q l","d"],["納豆オムレツ","🍳","P Fe Fo","c",10,340,"q","n e"],["納豆そば","🍜","P Fe Fo Fi","co",10,450,"q","n"],["とろろご飯","🍚","K Fi","c",5,400,"q l",""],["玄米ご飯と味噌汁","🍚","Fi B K","c",5,420,"l v",""],["オートミールとバナナ","🥣","Fi K Fe","cv",3,280,"q l",""],["全粒粉のサンドイッチ","🥪","Fi B P","v",3,380,"q","e"],["雑穀ごはんのおにぎり","🍙","Fi B","v",3,300,"q l",""],["豆とベジタブルのスープ","🥣","Fi K Fo","cv",20,260,"l v",""],["ひよこ豆のサラダ","🥗","Fi Fo P","cv",5,280,"q l v",""],["ミネストローネ","🍅","Fi K C Fo","cv",25,220,"l v",""],["ラタトゥイユ","🍆","K C Fi","c",30,200,"l v",""],["野菜たっぷり味噌ラーメン","🍜","B Fi P","o",0,650,"h v","m"],["チキンカレー","🍛","P B Zn","oc",30,700,"h","m"],["キーマカレー","🍛","Fe Zn P B","oc",25,650,"h","m"],["トマトとモッツァレラのサラダ","🍅","Ca K C","v",5,250,"q l","d"],["かぼちゃの煮物","🎃","K Fi C","cv",20,150,"l v",""],["焼き芋","🍠","K Fi C","vc",2,230,"q l",""],["里芋の味噌汁","🥣","K Fi","c",10,120,"l v",""],["アーモンドとドライフルーツ","🥜","Zn Fe K Fi","v",0,220,"q",""],["プルーンとヨーグルト","🫐","Fe Ca K","v",2,220,"q l","d"]].map(r=>({n:r[0],e:r[1],u:r[2].split(" "),s:r[3],m:r[4],k:r[5],w:r[6].split(" "),x:r[7].split(" ")}));
+const LM=[["s","塩分控えめ","🧂"],["k","カロリー控えめ","🔥"]];
+// 減塩タグ：果物・ヨーグルト・蒸す/焼く/生など味付けが薄くなりやすい料理（目安。実測値ではありません）
+const LS=new Set(["ヨーグルトとキウイ","ブロッコリーと卵のサラダ","いちごとオレンジ","バナナとヨーグルト","アボカドとトマトのサラダ","鶏むね肉の蒸し鶏","冷奴と薬味","ゆで卵と野菜スティック","鮭ときのこのホイル焼き","パプリカとトマトのマリネ","柿とキウイのフルーツ","キウイとオレンジのヨーグルト","グレープフルーツ","いちごヨーグルト","小松菜と豆乳のスムージー","きな粉ヨーグルト","オートミールとバナナ","ひよこ豆のサラダ","ラタトゥイユ","焼き芋","アーモンドとドライフルーツ","プルーンとヨーグルト"]);
+D.forEach(d=>{if(LS.has(d.n))d.w.push("s")});
+const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const s={scr:"home",nu:[],sc:"a",wi:[],list:[],i:0,fav:ld("fav",[]),his:ld("his",[]),ex:ld("ex",[]),lim:ld("lim",[]),free:ld("free",""),edit:false,sel:[]};
+const $=q=>document.querySelector(q);
+function go(x){s.scr=x;s.edit=false;s.sel=[];render();scrollTo(0,0)}
+function tg(a,v){const i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);render()}
+function toast(m){const t=$("#t");t.textContent=m;t.style.opacity=1;setTimeout(()=>t.style.opacity=0,1400)}
+function suggest(){
+  const fw=s.free.split(/[,、\s]+/).filter(Boolean);
+  s.list=D.filter(d=>!d.x.some(x=>s.ex.includes(x))&&!fw.some(w=>d.n.includes(w))&&(s.sc=="a"||d.s.includes(s.sc))&&(!s.lim.includes("s")||d.w.includes("s"))&&(!s.lim.includes("k")||d.k<=350))
+   .map(d=>({d,p:d.u.filter(u=>s.nu.includes(u)).length*10+d.w.filter(w=>s.wi.includes(w)).length*3+Math.random()}))
+   .filter(o=>o.p>=10).sort((a,b)=>b.p-a.p).map(o=>o.d);
+  s.i=0;go("res");
+}
+function pick(d){s.list=[d];s.i=0;go("res")}
+function decide(d){s.his.unshift({n:d.n,t:new Date().toLocaleDateString("ja-JP")});s.his=s.his.slice(0,30);sv("his",s.his);toast("履歴に保存しました")}
+function fav(n){const i=s.fav.indexOf(n);i<0?s.fav.push(n):s.fav.splice(i,1);sv("fav",s.fav);render()}
+const byName=n=>D.find(d=>d.n==n);
+const esc=v=>String(v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function saveSet(){s.free=$("#fr").value;sv("free",s.free);toast("保存しました ✓")}
+function te(){s.edit=!s.edit;s.sel=[];render()}
+function ts(i){const k=s.sel.indexOf(i);k<0?s.sel.push(i):s.sel.splice(k,1);render()}
+function sa(){const n=(s.scr=="his"?s.his:s.fav).length;s.sel=s.sel.length==n?[]:[...Array(n).keys()];render()}
+function del(){
+  const n=s.sel.length;if(!n||!confirm(n+"件を削除しますか？"))return;
+  if(s.scr=="his"){s.his=s.his.filter((_,i)=>!s.sel.includes(i));sv("his",s.his)}
+  else{s.fav=s.fav.filter((_,i)=>!s.sel.includes(i));sv("fav",s.fav)}
+  s.sel=[];if(!(s.scr=="his"?s.his:s.fav).length)s.edit=false;
+  toast(n+"件削除しました");render();
+}
+function lh(t,sub,n){return `<div class="top"><span style="width:56px"></span><div style="flex:1"><h2>${t}</h2></div>${n?`<button class="edt" onclick="te()">${s.edit?"完了":"編集"}</button>`:`<span style="width:56px"></span>`}</div><p class="sub">${s.edit?"削除するものを選んでください":sub}</p>`}
+function lr(i,main,right,act){const on=s.sel.includes(i);return s.edit?`<div class="li ${on?"on":""}" onclick="ts(${i})"><span><span class="ck">${on?"☑":"☐"}</span>${main}</span>${right}</div>`:`<div class="li" onclick="${act}"><span>${main}</span>${right}</div>`}
+function lb(n){return s.edit?`<div class="row bar"><button class="btn ghost" onclick="sa()">${s.sel.length==n?"選択解除":"すべて選択"}</button><button class="btn" ${s.sel.length?"":"disabled"} onclick="del()">削除${s.sel.length?"（"+s.sel.length+"）":""}</button></div>`:""}
+function head(t,sub,back){return `<div class="top"><button class="back" onclick="go('${back}')">‹</button><div style="flex:1"><h2>${t}</h2></div><span style="width:36px"></span></div><p class="sub">${sub}</p>`}
+function render(){
+  let h="";
+  if(s.scr=="home"){
+    h=`<h1>今日、<br>なにを<span class="o">補う？</span></h1><p class="o" style="font-weight:700">意識して摂りたい栄養素から<br>おすすめの料理を提案！</p>
+    <p>✅ 栄養素を選ぶだけでOK<br>✅ 自炊・コンビニ・外食に対応<br>✅ 苦手な食材は除外できる</p>
+    <div style="text-align:center;margin:8px 0"><svg class="mascot" viewBox="0 0 200 172" role="img" aria-label="サラダのキャラクター"><ellipse cx="100" cy="164" rx="58" ry="7" style="fill:var(--chip)"/><circle cx="46" cy="80" r="23" fill="#8fd16a"/><circle cx="154" cy="80" r="23" fill="#8fd16a"/><circle cx="72" cy="58" r="27" fill="#a6dd7e"/><circle cx="130" cy="56" r="28" fill="#a6dd7e"/><circle cx="100" cy="46" r="24" fill="#c4eb9a"/><circle cx="100" cy="80" r="26" fill="#8fd16a"/><path d="M52 76q8-12 18-9M108 34q10 2 14 14M138 84q6-9 15-7M88 72q8 4 5 14M30 72q3-6 9-8" fill="none" stroke="#6fb24f" stroke-width="3" stroke-linecap="round" opacity=".55"/><circle cx="62" cy="52" r="10" fill="#ff6b57"/><path d="M56 47q5-3 10 0" fill="none" stroke="#ffd2c8" stroke-width="2.5" stroke-linecap="round"/><circle cx="130" cy="48" r="11" fill="#e4f6b8" stroke="#7cc45a" stroke-width="3"/><circle cx="126" cy="46" r="1.8" fill="#7cc45a"/><circle cx="134" cy="48" r="1.8" fill="#7cc45a"/><circle cx="130" cy="54" r="1.8" fill="#7cc45a"/><circle cx="97" cy="30" r="7" fill="#ffa63d"/><circle cx="97" cy="30" r="2.8" fill="#ffd08a"/><circle cx="150" cy="70" r="4.5" fill="#ffe45e"/><circle cx="42" cy="86" r="4.5" fill="#ffe45e"/><circle cx="76" cy="84" r="4" fill="#ffe45e"/><path d="M28 94h144c0 36-30 62-72 62s-72-26-72-62z" fill="#ffe9cf"/><rect x="22" y="90" width="156" height="12" rx="6" style="fill:var(--o)"/><circle cx="82" cy="120" r="5" fill="#4a2c17"/><circle cx="118" cy="120" r="5" fill="#4a2c17"/><path d="M94 128q6 6 12 0" fill="none" stroke="#4a2c17" stroke-width="3" stroke-linecap="round"/><ellipse cx="68" cy="130" rx="8" ry="5" fill="#ff9d8f" opacity=".7"/><ellipse cx="132" cy="130" rx="8" ry="5" fill="#ff9d8f" opacity=".7"/><path d="M174 22l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" style="fill:var(--o)"/><path d="M20 44l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" style="fill:var(--o)"/></svg></div><button class="btn" onclick="go('nu')">はじめる</button>
+    <p class="tip">① 栄養素を選ぶ → ② シーンを選ぶ → ③ 料理を提案</p>`;
+  }else if(s.scr=="nu"){
+    h=head("栄養素を選択","意識して摂りたい栄養素を選んでください（複数OK）","home")+`<div class="grid g3">${N.map(n=>`<button class="tile ${s.nu.includes(n[0])?"on":""}" onclick="tg(s.nu,'${n[0]}')"><span class="e">${n[2]}</span>${n[1]}</button>`).join("")}</div>
+    <p class="tip">選択中：${s.nu.map(u=>NM[u]).join("・")||"なし"}</p><button class="btn" ${s.nu.length?"":"disabled"} onclick="go('sc')">次へ</button>`;
+  }else if(s.scr=="sc"){
+    h=head("食べるシーン","あなたの状況に合わせて提案します","nu")+`<div class="grid g2">${SC.map(c=>`<button class="tile ${s.sc==c[0]?"on":""}" style="padding:20px 4px" onclick="s.sc='${c[0]}';render()"><span class="e">${c[2]}</span>${c[1]}</button>`).join("")}</div>
+    <p class="tip" style="text-align:left">その他の希望（任意）</p><div class="chips">${WI.map(w=>`<button class="tile ${s.wi.includes(w[0])?"on":""}" onclick="tg(s.wi,'${w[0]}')">${w[1]}</button>`).join("")}</div>
+    <p class="tip" style="text-align:left">控えたいもの（任意）</p><div class="chips">${LM.map(l=>`<button class="tile ${s.lim.includes(l[0])?"on":""}" onclick="tg(s.lim,'${l[0]}');sv('lim',s.lim)">${l[2]} ${l[1]}</button>`).join("")}</div>
+    <p class="tip" style="text-align:left;margin-top:8px">※ 塩分控えめは味付けが薄くなりやすい料理の目安です。カロリー控えめは約350kcal以下。</p>
+    <button class="btn" onclick="suggest()">この条件で提案する</button>`;
+  }else if(s.scr=="res"){
+    const d=s.list[s.i];
+    h=head("料理の提案","選んだ栄養素を含む料理です","sc");
+    if(!d)h=h+`<div class="card">条件に合う料理が見つかりませんでした。<br>栄養素やシーンを変えてみてください。</div>`;
+    else h+=`<div class="card"><button class="heart" onclick="fav('${d.n}')">${s.fav.includes(d.n)?"❤️":"🤍"}</button><div class="big">${d.e}</div><h2 style="font-size:21px">${d.n}</h2>
+    <div>${d.u.map(u=>`<span class="chip" ${s.nu.includes(u)?'style="background:var(--o);color:#fff"':""}>${NM[u]}</span>`).join("")}</div>
+    <div class="meta"><span>⏱ ${d.m?"約"+d.m+"分":"調理なし"}</span><span>🔥 約${d.k}kcal</span><span>${[...d.s].map(c=>SC.find(x=>x[0]==c)[1]).join("・")}</span></div></div>
+    <div class="row"><button class="btn ghost" onclick="s.i=(s.i+1)%s.list.length;render()">別の料理を見る</button><button class="btn" onclick="decide(s.list[s.i])">これにする！</button></div>
+    <p class="tip">${s.list.length>1?(s.i+1)+" / "+s.list.length+" 件":""}</p>`;
+  }else if(s.scr=="his"){
+    h=lh("履歴","タップでもう一度見られます",s.his.length)+(s.his.map((x,i)=>lr(i,`${byName(x.n).e} ${x.n}`,`<span class="sub" style="margin:0">${x.t}</span>`,`pick(byName('${x.n}'))`)).join("")||`<p class="sub">まだ履歴がありません</p>`)+lb(s.his.length);
+  }else if(s.scr=="fav"){
+    h=lh("お気に入り","❤️ をつけた料理が並びます",s.fav.length)+(s.fav.map((n,i)=>lr(i,`${byName(n).e} ${n}`,`<span>❤️</span>`,`pick(byName('${n}'))`)).join("")||`<p class="sub">まだありません</p>`)+lb(s.fav.length);
+  }else if(s.scr=="how"){
+    const st=["アプリを開く","「はじめる」をタップ","補いたい栄養素を選ぶ（複数OK）","自炊・コンビニ・外食などのシーンを選ぶ。控えたいもの（塩分・カロリー）も選べます","おすすめの料理が表示されます。「別の料理を見る」で他の候補、「これにする！」で履歴に保存"];
+    h=`<h2>使い方</h2><p class="sub">はじめての方はこちら</p><div class="box">${st.map((x,i)=>`<div class="step"><b>${i+1}</b><span>${x}</span></div>`).join("")}</div><div class="box" style="margin-top:14px"><div class="step"><span>✓ 栄養素を選ぶだけで、料理を提案<br>✓ ❤️ でお気に入り、履歴から見返せる<br>✓ 苦手な食材は「設定」で除外できる</span></div></div>`;
+  }else{
+    h=`<h2>設定</h2><p class="sub">好みに合わせて調整できます</p><div class="box"><h2>苦手な食材を除外</h2><p class="sub" style="text-align:left;margin:0 0 4px">選択した食材を使った料理は、提案に出てこなくなります。</p>${EX.map(x=>`<button class="srow" onclick="s.free=$('#fr').value;tg(s.ex,'${x[0]}');sv('ex',s.ex)"><span class="g">${x[1]}を除く</span><span class="sw ${s.ex.includes(x[0])?"on":""}"></span></button>`).join("")}<div class="lab">その他（自由入力）</div><input class="ti" id="fr" value="${esc(s.free)}" placeholder="例：セロリ、ラム肉 など"><p class="tip" style="text-align:left;margin-top:6px">※料理名に含まれる言葉で除外します（カンマ区切り）</p></div><button class="btn" onclick="saveSet()">保存する</button>`;
+  }
+  $("#app").innerHTML=h;
+  const m=s.scr=="nu"||s.scr=="sc"||s.scr=="res"?"home":s.scr;
+  $("#nav").innerHTML=[["home","🏠","ホーム"],["his","🕘","履歴"],["fav","❤️","お気に入り"],["set","⚙️","設定"],["how","ⓘ","使い方"]].map(n=>`<button class="${m==n[0]?"on":""}" onclick="go('${n[0]}')"><b>${n[1]}</b>${n[2]}</button>`).join("");
+}
+render();
+</script></body></html>
