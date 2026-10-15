@@ -2,19 +2,14 @@
   "name": "Nutrient Picker",
   "short_name": "Nutrient Picker",
   "description": "栄養素から食事を選ぶアプリ",
-  "start_url": "./nutrient-picker.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fff8f1",
   "theme_color": "#f26f12",
   "lang": "ja",
   "icons": [
     {
-      "src": "nutrient-picker.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "nutrient-picker.png",
+      "src": "nutrient-picker.PNG",
       "sizes": "512x512",
       "type": "image/png"
     }
